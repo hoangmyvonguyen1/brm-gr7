@@ -1,229 +1,85 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BRM - GR 7</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BRM - GR 7 | Simulated Feed</title>
 <style>
-:root{--bg:#090909;--panel:#171717;--muted:#a5a5a5;--accent:#fe2c55;--cyan:#25f4ee}
-*{box-sizing:border-box}body{margin:0;background:#080808;color:#fff;font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
-button,input{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:12px 18px;font-weight:700}
-.app{min-height:100vh;display:grid;place-items:center;padding:18px}
-.phone{width:min(100%,430px);min-height:min(850px,calc(100vh - 36px));background:#101010;border:1px solid #292929;border-radius:28px;overflow:hidden;position:relative;box-shadow:0 20px 80px #0009}
-.top{height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #262626;background:#111}
-.brand{font-weight:900;letter-spacing:.4px}.brand span{color:var(--accent)}.step{font-size:12px;color:var(--muted)}
-.screen{display:none;padding:24px 20px 28px}.screen.active{display:block}
+:root{--bg:#080808;--panel:#171717;--muted:#aaa;--accent:#fe2c55;--cyan:#25f4ee}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input{font:inherit}button{cursor:pointer;border:0;border-radius:12px;padding:13px 18px;font-weight:750}
+.app{min-height:100vh;display:grid;place-items:center;padding:16px}.phone{width:min(100%,430px);height:min(900px,calc(100vh - 32px));min-height:650px;background:#101010;border:1px solid #292929;border-radius:28px;overflow:hidden;position:relative;box-shadow:0 20px 80px #0009;display:flex;flex-direction:column}
+.top{height:58px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #262626;background:#111;z-index:3}
+.brand{font-weight:900}.brand span{color:var(--accent)}.step{font-size:12px;color:var(--muted)}
+.screen{display:none;flex:1;min-height:0;padding:24px 20px 28px;overflow:auto}.screen.active{display:block}
 h1{font-size:29px;line-height:1.12;margin:12px 0}h2{font-size:22px;margin:8px 0 14px}p{color:#c7c7c7}
-.small{font-size:12px;color:var(--muted)}.primary{background:var(--accent);color:white;width:100%;margin-top:16px}.secondary{background:#292929;color:#fff;width:100%;margin-top:10px}
+.small{font-size:12px;color:var(--muted)}.primary{background:var(--accent);color:#fff;width:100%;margin-top:16px}.secondary{background:#292929;color:#fff;width:100%;margin-top:10px}
 input[type=text]{width:100%;padding:14px;border-radius:10px;border:1px solid #414141;background:#1a1a1a;color:#fff;margin-top:8px}
-.feed{padding:0;height:calc(min(850px,100vh - 94px) - 58px);min-height:650px;position:relative;background:#151515;overflow:hidden}
-.video{position:absolute;inset:0;background:radial-gradient(circle at 60% 35%,#714c8d 0,#302342 35%,#101010 76%);display:flex;align-items:center;justify-content:center;text-align:center;padding:28px}
-.video.util{background:radial-gradient(circle at 55% 35%,#3c7e85 0,#1d3c4a 38%,#101010 78%)}
-.mock-content{max-width:290px}.mock-content .eyebrow{font-size:11px;letter-spacing:2px;color:#eee9}.mock-content .big{font-size:38px;font-weight:900;line-height:1.02;margin:14px 0;text-shadow:0 3px 20px #0008}.mock-content .sub{font-size:14px;color:#eee}
-.feed-head{position:absolute;top:14px;left:0;right:0;text-align:center;font-weight:800;text-shadow:0 1px 8px #000}
-.feed-bottom{position:absolute;left:18px;right:78px;bottom:26px;text-shadow:0 1px 8px #000}.feed-bottom strong{display:block;margin-bottom:7px}
-.actions{position:absolute;right:14px;bottom:30px;display:grid;gap:18px;text-align:center}.action{font-size:22px}.action small{display:block;font-size:10px}
-.overlay-note{position:absolute;top:58px;left:16px;right:16px;background:#0009;padding:10px;border-radius:10px;font-size:12px;text-align:center}
 .question{background:#1b1b1b;padding:14px;border-radius:13px;margin:12px 0}.question label{display:block;margin-bottom:10px;font-weight:650}
 .scale{display:flex;justify-content:space-between;gap:6px}.scale label{font-size:12px;color:#ddd;display:grid;justify-items:center;gap:6px;flex:1}.scale input{accent-color:var(--accent)}
-.choice{display:flex;gap:10px;align-items:flex-start;background:#1b1b1b;padding:13px;border-radius:12px;margin:10px 0}.choice input{margin-top:4px;accent-color:var(--accent)}
-.timer{font-size:42px;font-weight:900;text-align:center;margin:24px 0}.watch-card{height:340px;border-radius:18px;background:linear-gradient(145deg,#252525,#101010);display:grid;place-items:center;text-align:center;padding:25px}
+.feed-screen{padding:0!important;overflow:hidden!important;flex-direction:column}.feed-screen.active{display:flex}
+.feed-topline{height:38px;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;border-bottom:1px solid #222}
+.feed{flex:1;min-height:0;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none}.feed::-webkit-scrollbar{display:none}
+.feed-card{height:100%;min-height:100%;scroll-snap-align:start;position:relative;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;background:radial-gradient(circle at 55% 35%,#714c8d 0,#302342 38%,#101010 78%)}
+.feed-card.util{background:radial-gradient(circle at 55% 35%,#3c7e85 0,#1d3c4a 40%,#101010 80%)}
+.feed-card.organic:nth-child(odd){background:radial-gradient(circle at 40% 30%,#6b5736 0,#30271e 42%,#101010 82%)}
+.feed-card.organic:nth-child(even){background:radial-gradient(circle at 60% 30%,#315e65 0,#1b3038 42%,#101010 82%)}
+.mock-content{max-width:290px}.eyebrow{font-size:11px;letter-spacing:2px;color:#eee9}.big{font-size:36px;font-weight:900;line-height:1.03;margin:14px 0;text-shadow:0 3px 20px #0008}.sub{font-size:14px;color:#eee}
+.feed-head{position:absolute;top:14px;left:0;right:0;text-align:center;font-weight:800;text-shadow:0 1px 8px #000}
+.feed-bottom{position:absolute;left:18px;right:78px;bottom:24px;text-align:left;text-shadow:0 1px 8px #000}.feed-bottom strong{display:block;margin-bottom:7px}
+.actions{position:absolute;right:14px;bottom:28px;display:grid;gap:18px;text-align:center}.action{font-size:22px}.action small{display:block;font-size:10px}
+.ad-tag{position:absolute;top:52px;left:16px;background:#0009;border:1px solid #ffffff33;border-radius:5px;padding:4px 8px;font-size:10px;font-weight:800;letter-spacing:1px}
+.feed-footer{height:76px;flex:none;padding:8px 14px;background:#101010;border-top:1px solid #262626}.feed-footer .small{text-align:center;margin:0 0 4px}
 .footer{padding:14px 20px;color:#777;font-size:10px;text-align:center;border-top:1px solid #222}
-@media(max-width:480px){.app{padding:0}.phone{width:100%;min-height:100vh;border:0;border-radius:0}.feed{height:calc(100vh - 58px);min-height:600px}}
-</style>
-</head>
-<body>
-<div class="app"><main class="phone">
+@media(max-width:480px){.app{padding:0}.phone{width:100%;height:100dvh;min-height:600px;border:0;border-radius:0}}
+</style></head>
+<body><div class="app"><main class="phone">
 <header class="top"><div class="brand">BRM <span>-</span> GR 7</div><div class="step" id="step">WELCOME</div></header>
-
 <section class="screen active" id="welcome">
-<p class="small">RESEARCH STUDY · PARTICIPANT EXPERIENCE</p>
-<h1>Welcome to<br>BRM - GR 7</h1>
-<p>Thank you for taking part in this study. You will see a short-form video experience and answer a few questions about your impressions.</p>
+<p class="small">RESEARCH STUDY · PARTICIPANT EXPERIENCE</p><h1>Welcome to<br>BRM - GR 7</h1>
+<p>You will browse a simulated short-form video feed and then answer a few questions about your experience. You may scroll naturally and skip any video.</p>
 <div class="question"><label for="pid">Participant ID</label><input id="pid" type="text" placeholder="Enter your assigned participant ID"></div>
-<p class="small">Please use the participant ID provided by the researcher. Your responses should be based on your own experience.</p>
-<button class="primary" id="start">Start experience</button>
-<p class="small">Prototype notice: this version assigns one of four experimental groups and stores data only in this browser. It is not yet connected to a secure central database.</p>
+<p class="small">Please use the participant ID provided by the researcher. This prototype currently stores session data in this browser only.</p>
+<button class="primary" id="start">Enter feed</button>
+<p class="small">Research prototype: this is a simulated feed, not the TikTok platform. Replace all sample cards with approved video stimuli before formal data collection.</p>
 </section>
-
-<section class="screen feed" id="hook">
-<div class="video" id="video">
- <div class="mock-content"><div class="eyebrow">A SHORT-FORM VIDEO</div><div class="big" id="hookTitle">WAIT… WHAT HAPPENS NEXT?</div><div class="sub" id="hookSub">A sample creative placeholder</div></div>
+<section class="screen feed-screen" id="feedScreen">
+<div class="feed-topline">For You</div>
+<div class="feed" id="feed">
+<div class="feed-card organic" data-kind="organic" data-id="organic-1"><div class="mock-content"><div class="eyebrow">VIDEO 01 · ORGANIC</div><div class="big">A LITTLE MOMENT OF JOY</div><div class="sub">Organic video placeholder 1</div></div><div class="feed-head">For You</div><div class="feed-bottom"><strong>@creator_one</strong><span>A sample everyday moment…</span></div><div class="actions"><div class="action">♡<small>Like</small></div><div class="action">◯<small>Comment</small></div><div class="action">↗<small>Share</small></div></div></div>
+<div class="feed-card organic" data-kind="organic" data-id="organic-2"><div class="mock-content"><div class="eyebrow">VIDEO 02 · ORGANIC</div><div class="big">TRY THIS NEXT TIME</div><div class="sub">Organic video placeholder 2</div></div><div class="feed-head">For You</div><div class="feed-bottom"><strong>@creator_two</strong><span>A useful tip from the community…</span></div><div class="actions"><div class="action">♡<small>Like</small></div><div class="action">◯<small>Comment</small></div><div class="action">↗<small>Share</small></div></div></div>
+<div class="feed-card organic" data-kind="organic" data-id="organic-3"><div class="mock-content"><div class="eyebrow">VIDEO 03 · ORGANIC</div><div class="big">WAIT FOR THE REVEAL</div><div class="sub">Organic video placeholder 3</div></div><div class="feed-head">For You</div><div class="feed-bottom"><strong>@creator_three</strong><span>One more clip before the next…</span></div><div class="actions"><div class="action">♡<small>Like</small></div><div class="action">◯<small>Comment</small></div><div class="action">↗<small>Share</small></div></div></div>
+<div class="feed-card" id="adCard" data-kind="ad" data-id="experimental-ad"><div class="mock-content"><div class="eyebrow">SPONSORED · EXPERIMENTAL AD</div><div class="big" id="hookTitle">YOUR AD CREATIVE</div><div class="sub" id="hookSub">Approved experimental ad placeholder</div></div><div class="feed-head">For You</div><div class="ad-tag">Sponsored</div><div class="feed-bottom"><strong>@brand_demo</strong><span id="caption">Experimental advertisement placeholder</span></div><div class="actions"><div class="action">♡<small>Like</small></div><div class="action">◯<small>Comment</small></div><div class="action">↗<small>Share</small></div></div></div>
+<div class="feed-card organic" data-kind="organic" data-id="organic-4"><div class="mock-content"><div class="eyebrow">VIDEO 05 · ORGANIC</div><div class="big">HERE'S ANOTHER IDEA</div><div class="sub">Organic video placeholder 4</div></div><div class="feed-head">For You</div><div class="feed-bottom"><strong>@creator_four</strong><span>Continue browsing your feed…</span></div><div class="actions"><div class="action">♡<small>Like</small></div><div class="action">◯<small>Comment</small></div><div class="action">↗<small>Share</small></div></div></div>
+<div class="feed-card organic" data-kind="organic" data-id="organic-5"><div class="mock-content"><div class="eyebrow">VIDEO 06 · ORGANIC</div><div class="big">ONE LAST THING</div><div class="sub">Organic video placeholder 5</div></div><div class="feed-head">For You</div><div class="feed-bottom"><strong>@creator_five</strong><span>Thanks for browsing…</span></div><div class="actions"><div class="action">♡<small>Like</small></div><div class="action">◯<small>Comment</small></div><div class="action">↗<small>Share</small></div></div></div>
 </div>
-<div class="feed-head">For You</div>
-<div class="overlay-note">Placeholder creative only. Replace with the approved experimental video before data collection.</div>
-<div class="feed-bottom"><strong>@brand_demo</strong><span id="caption">Something unexpected is about to happen…</span></div>
-<div class="actions"><div class="action">♡<small>Like</small></div><div class="action">◯<small>Comment</small></div><div class="action">↗<small>Share</small></div></div>
+<div class="feed-footer"><p class="small">Scroll naturally. You can skip any video, including the sponsored video.</p><button class="primary" id="toSurvey" style="margin:0;padding:10px">Continue to questions</button></div>
 </section>
-
-<section class="screen" id="survey">
-<p class="small">PART 2 · YOUR IMPRESSION</p><h2>Please answer based on how you feel right now.</h2>
-<p>Indicate how much you agree with each statement. These are editable draft items and must be replaced with the researcher's approved, validated scale before data collection.</p>
-<div id="items"></div>
-<button class="primary" id="submitSurvey">Continue</button>
-</section>
-
-<section class="screen" id="voluntary">
-<p class="small">PART 3 · OPTIONAL CONTINUATION</p><h2>Would you like to watch the rest?</h2>
-<p>You may choose to continue watching or finish the experience. There is no right or wrong choice.</p>
-<div class="watch-card"><div><div style="font-size:42px">▶</div><strong>Full video placeholder</strong><p class="small">The complete advertisement will be placed here.</p></div></div>
-<button class="primary" id="watch">Watch the rest</button>
-<button class="secondary" id="finishNow">Finish now</button>
-</section>
-
-<section class="screen" id="watching">
-<p class="small">PART 4 · VOLUNTARY VIEWING</p><h2>Now playing</h2>
-<div class="watch-card"><div><div style="font-size:42px">▶</div><strong>Full video placeholder</strong><p class="small">Replace with the complete ad video.</p></div></div>
-<div class="timer" id="timer">00:00</div>
-<p class="small" style="text-align:center">Prototype viewing time: elapsed time while this page is visible.</p>
-<button class="primary" id="endWatch">Finish viewing</button>
-</section>
-
-<section class="screen" id="done">
-<p class="small">COMPLETE</p><h1>Thank you!</h1><p>Your prototype session has ended.</p>
-<div class="question" id="summary"></div>
-<button class="primary" id="export">Export this session (CSV)</button>
-<button class="secondary" id="restart">Start another test session</button>
-</section>
-<div class="footer">BRM - GR 7 · Research prototype</div>
+<section class="screen" id="survey"><p class="small">PART 2 · YOUR IMPRESSION</p><h2>Please answer based on how you feel right now.</h2>
+<p class="small">The items below are draft placeholders. Replace them with the researcher's approved, validated scale before formal data collection.</p><div id="items"></div><button class="primary" id="submitSurvey">Finish</button></section>
+<section class="screen" id="done"><p class="small">COMPLETE</p><h1>Thank you!</h1><p>Your prototype session has ended.</p><div class="question" id="summary"></div><button class="primary" id="export">Export session data (CSV)</button><button class="secondary" id="restart">Start another test session</button></section>
+<div class="footer">BRM - GR 7 · Simulated feed research prototype</div>
 </main></div>
 <script>
-const state={
- participantId:"",groupId:"",condition:"",hookVersion:"",
- hookStart:null,hookDurationMs:null,answers:[],
- voluntaryChoice:"",voluntaryStart:null,voluntaryDurationMs:0,finishedAt:null
-};
+const state={participantId:"",groupId:"",condition:"",hookVersion:"",feedEvents:[],adEnteredAt:null,adExposureMs:0,adSeen:false,adSkipped:false,adCompleted:false,postHookStart:null,postHookDurationMs:0,answers:[],finishedAt:null};
 const $=id=>document.getElementById(id);
-let hookTimeout=null,watchFrame=null,watchStartWall=null;
-function show(id,label){
- document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
- $(id).classList.add("active");$("step").textContent=label;
-}
-function fmt(ms){
- const s=Math.max(0,Math.floor(ms/1000));
- return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
-}
-const draftItems=[
- "I feel curious about what happens next.",
- "I want to find out more about what I have just seen.",
- "I feel a desire to continue watching."
-];
-function renderItems(){
- $("items").innerHTML="";
- draftItems.forEach((q,i)=>{
-  const wrap=document.createElement("div");wrap.className="question";
-  const label=document.createElement("label");label.textContent=(i+1)+". "+q;wrap.appendChild(label);
-  const scale=document.createElement("div");scale.className="scale";
-  for(let n=1;n<=7;n++){
-   const l=document.createElement("label");
-   l.innerHTML=`<input type="radio" name="q${i}" value="${n}"><span>${n}</span>`;
-   scale.appendChild(l);
-  }
-  wrap.appendChild(scale);$("items").appendChild(wrap);
- });
-}
-// Four equally likely conditions. This is client-side prototype randomization,
-// not concealed/server-side allocation for formal data collection.
 const GROUPS=[
- {groupId:"G1",condition:"Hedonic",hookVersion:"A",title:"FEEL THE MOMENT",sub:"A hedonic-style Hook A placeholder",caption:"An experience worth discovering…"},
- {groupId:"G2",condition:"Hedonic",hookVersion:"B",title:"WAIT… THERE'S MORE",sub:"A hedonic-style Hook B placeholder",caption:"A moment you won't want to miss…"},
- {groupId:"G3",condition:"Utilitarian",hookVersion:"A",title:"A SMARTER WAY TO SOLVE IT",sub:"A utilitarian-style Hook A placeholder",caption:"A solution you may want to know about…"},
- {groupId:"G4",condition:"Utilitarian",hookVersion:"B",title:"HERE'S HOW TO MAKE IT EASIER",sub:"A utilitarian-style Hook B placeholder",caption:"Discover a practical way to get it done…"}
-];
-function assignGroup(){
- // Keep the same assignment for the same participant ID in this browser.
- const key="brm_gr7_assignment_"+state.participantId;
- let saved=null;
- try{saved=JSON.parse(localStorage.getItem(key)||"null");}catch(e){}
- let group=saved&&GROUPS.find(g=>g.groupId===saved.groupId);
- if(!group){
-  group=GROUPS[Math.floor(Math.random()*GROUPS.length)];
-  try{localStorage.setItem(key,JSON.stringify({groupId:group.groupId,assignedAt:new Date().toISOString()}));}catch(e){}
- }
- Object.assign(state,{groupId:group.groupId,condition:group.condition,hookVersion:group.hookVersion});
- return group;
-}
-$("start").onclick=()=>{
- const id=$("pid").value.trim();
- if(!id){alert("Please enter your participant ID.");return;}
- state.participantId=id;
- const group=assignGroup();
- $("hookTitle").textContent=group.title;
- $("hookSub").textContent=group.sub;
- $("video").classList.toggle("util",state.condition==="Utilitarian");
- $("caption").textContent=group.caption;
- state.hookStart=performance.now();
- show("hook","VIDEO FEED");
- if(hookTimeout)clearTimeout(hookTimeout);
- // Prototype hook exposure duration; set to the approved protocol duration.
- hookTimeout=setTimeout(()=>{
-  state.hookDurationMs=performance.now()-state.hookStart;
-  renderItems();show("survey","QUESTIONNAIRE");
- },8000);
-};
-$("submitSurvey").onclick=()=>{
- const values=draftItems.map((_,i)=>{
-  const el=document.querySelector(`input[name="q${i}"]:checked`);
-  return el?Number(el.value):null;
- });
- if(values.some(v=>v===null)){alert("Please answer all questions.");return;}
- state.answers=values;show("voluntary","YOUR CHOICE");
-};
-function finish(){
- state.finishedAt=new Date().toISOString();
- if(state.voluntaryStart!==null){
-  state.voluntaryDurationMs=performance.now()-state.voluntaryStart;
-  state.voluntaryStart=null;
- }
- if(watchFrame)cancelAnimationFrame(watchFrame);
- show("done","COMPLETE");
- $("summary").innerHTML=
-  `<b>Participant:</b> ${escapeHtml(state.participantId)}<br>`+
-  `<b>Assigned group:</b> ${state.groupId}<br>`+
-  `<b>Condition:</b> ${state.condition}<br>`+
-  `<b>Hook version:</b> ${state.hookVersion}<br>`+
-  `<b>Voluntary viewing:</b> ${state.voluntaryChoice}<br>`+
-  `<b>Viewing duration:</b> ${fmt(state.voluntaryDurationMs)}`;
-}
-function escapeHtml(s){
- return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-$("watch").onclick=()=>{
- state.voluntaryChoice="Continued";
- state.voluntaryStart=performance.now();
- watchStartWall=performance.now();
- show("watching","VOLUNTARY VIEWING");
- const tick=()=>{
-  if($("watching").classList.contains("active")){
-   $("timer").textContent=fmt(performance.now()-watchStartWall);
-   watchFrame=requestAnimationFrame(tick);
-  }
- };
- tick();
-};
-$("finishNow").onclick=()=>{
- state.voluntaryChoice="Did not continue";
- state.voluntaryDurationMs=0;finish();
-};
-$("endWatch").onclick=()=>{
- if(state.voluntaryStart!==null){
-  state.voluntaryDurationMs=performance.now()-state.voluntaryStart;
-  state.voluntaryStart=null;
- }
- finish();
-};
-$("export").onclick=()=>{
- const headers=["participant_id","group_id","condition","hook_version","hook_duration_ms",
-  "curiosity_item_scores","voluntary_choice","voluntary_viewing_ms","finished_at"];
- const values=[state.participantId,state.groupId,state.condition,state.hookVersion,state.hookDurationMs,
-  state.answers.join("|"),state.voluntaryChoice,state.voluntaryDurationMs,state.finishedAt];
- const csv=[headers.join(","),values.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")].join("\n");
- const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
- const a=document.createElement("a");a.href=URL.createObjectURL(blob);
- a.download=`BRM-GR7-${state.participantId}.csv`;a.click();URL.revokeObjectURL(a.href);
-};
+{groupId:"G1",condition:"Hedonic",hookVersion:"A",title:"FEEL THE MOMENT",sub:"Hedonic Hook A · replace with approved stimulus",caption:"An experience worth discovering…"},
+{groupId:"G2",condition:"Hedonic",hookVersion:"B",title:"WAIT… THERE'S MORE",sub:"Hedonic Hook B · replace with approved stimulus",caption:"A moment you won't want to miss…"},
+{groupId:"G3",condition:"Utilitarian",hookVersion:"A",title:"A SMARTER WAY TO SOLVE IT",sub:"Utilitarian Hook A · replace with approved stimulus",caption:"A solution you may want to know about…"},
+{groupId:"G4",condition:"Utilitarian",hookVersion:"B",title:"HERE'S HOW TO MAKE IT EASIER",sub:"Utilitarian Hook B · replace with approved stimulus",caption:"Discover a practical way to get it done…"}];
+const draftItems=["I feel curious about what happens next.","I want to find out more about what I have just seen.","I feel a desire to continue watching."];
+function show(id,label){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");$("step").textContent=label}
+function assignGroup(){const g=GROUPS[Math.floor(Math.random()*GROUPS.length)];Object.assign(state,{groupId:g.groupId,condition:g.condition,hookVersion:g.hookVersion});return g}
+function renderItems(){$("items").innerHTML="";draftItems.forEach((q,i)=>{const w=document.createElement("div");w.className="question";const l=document.createElement("label");l.textContent=(i+1)+". "+q;w.appendChild(l);const s=document.createElement("div");s.className="scale";for(let n=1;n<=7;n++){const x=document.createElement("label");x.innerHTML='<input type="radio" name="q'+i+'" value="'+n+'"><span>'+n+'</span>';s.appendChild(x)}w.appendChild(s);$("items").appendChild(w)})}
+function fmt(ms){const s=Math.max(0,Math.floor((ms||0)/1000));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function enterCard(card){const now=performance.now();state.feedEvents.push({video_id:card.dataset.id,kind:card.dataset.kind,event:"enter",at_ms:Math.round(now)});if(card.dataset.kind==="ad"){state.adSeen=true;state.adEnteredAt=now}else if(state.adSeen&&state.postHookStart===null&&card.dataset.kind==="organic"){state.postHookStart=now}}
+function leaveCard(card){const now=performance.now();state.feedEvents.push({video_id:card.dataset.id,kind:card.dataset.kind,event:"leave",at_ms:Math.round(now)});if(card.dataset.kind==="ad"&&state.adEnteredAt!==null){state.adExposureMs+=now-state.adEnteredAt;state.adEnteredAt=null;state.adSkipped=state.adExposureMs<8000;state.adCompleted=state.adExposureMs>=8000} }
+let observer;
+$("start").onclick=()=>{const id=$("pid").value.trim();if(!id){alert("Please enter your participant ID.");return}state.participantId=id;const g=assignGroup();$("hookTitle").textContent=g.title;$("hookSub").textContent=g.sub;$("caption").textContent=g.caption;$("adCard").classList.toggle("util",g.condition==="Utilitarian");show("feedScreen","VIDEO FEED");const cards=[...document.querySelectorAll(".feed-card")];observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>=.55){if(!e.target.dataset.active){e.target.dataset.active="1";enterCard(e.target)}}else if(e.target.dataset.active){delete e.target.dataset.active;leaveCard(e.target)}}),{root:$("feed"),threshold:[.55]});cards.forEach(c=>observer.observe(c));};
+$("toSurvey").onclick=()=>{if(state.adEnteredAt!==null){state.adExposureMs+=performance.now()-state.adEnteredAt;state.adEnteredAt=null}if(state.postHookStart!==null){state.postHookDurationMs=performance.now()-state.postHookStart;state.postHookStart=null}show("survey","QUESTIONNAIRE");renderItems()};
+$("submitSurvey").onclick=()=>{const values=draftItems.map((_,i)=>{const el=document.querySelector('input[name="q'+i+'"]:checked');return el?Number(el.value):null});if(values.some(v=>v===null)){alert("Please answer all questions.");return}state.answers=values;finish()};
+function finish(){if(state.adEnteredAt!==null){state.adExposureMs+=performance.now()-state.adEnteredAt;state.adEnteredAt=null}if(state.postHookStart!==null){state.postHookDurationMs=performance.now()-state.postHookStart;state.postHookStart=null}state.finishedAt=new Date().toISOString();if(observer)observer.disconnect();show("done","COMPLETE");$("summary").innerHTML='<b>Participant:</b> '+escapeHtml(state.participantId)+'<br><b>Group:</b> '+state.groupId+' ('+state.condition+' / Hook '+state.hookVersion+')<br><b>Ad exposure:</b> '+fmt(state.adExposureMs)+'<br><b>Ad skipped:</b> '+(state.adSkipped?"Yes":"No / not classifiable")+'<br><b>Post-hook feed time:</b> '+fmt(state.postHookDurationMs)}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+$("export").onclick=()=>{const headers=["participant_id","group_id","condition","hook_version","ad_seen","ad_exposure_ms","ad_skipped_under_8s","ad_completed_8s_or_more","post_hook_feed_time_ms","curiosity_item_scores","feed_events_json","finished_at"];const vals=[state.participantId,state.groupId,state.condition,state.hookVersion,state.adSeen,state.adExposureMs,state.adSkipped,state.adCompleted,state.postHookDurationMs,state.answers.join("|"),JSON.stringify(state.feedEvents),state.finishedAt];const csv=[headers.join(","),vals.map(v=>'"'+String(v??"").replaceAll('"','""')+'"').join(",")].join("\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="BRM-GR7-"+state.participantId+".csv";a.click();URL.revokeObjectURL(a.href)};
 $("restart").onclick=()=>location.reload();
-renderItems();
-</script>
-</body>
-</html>
+</script></body></html>
