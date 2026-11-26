@@ -43,7 +43,7 @@ input[type=text]{width:100%;padding:14px;border-radius:10px;border:1px solid #41
 <div class="question"><label for="pid">Participant ID</label><input id="pid" type="text" placeholder="Enter your assigned participant ID"></div>
 <p class="small">Please use the participant ID provided by the researcher. Your responses should be based on your own experience.</p>
 <button class="primary" id="start">Start experience</button>
-<p class="small">Prototype notice: this starter version stores data only in this browser. It is not yet connected to a secure central database.</p>
+<p class="small">Prototype notice: this version assigns one of four experimental groups and stores data only in this browser. It is not yet connected to a secure central database.</p>
 </section>
 
 <section class="screen feed" id="hook">
@@ -51,7 +51,7 @@ input[type=text]{width:100%;padding:14px;border-radius:10px;border:1px solid #41
  <div class="mock-content"><div class="eyebrow">A SHORT-FORM VIDEO</div><div class="big" id="hookTitle">WAIT… WHAT HAPPENS NEXT?</div><div class="sub" id="hookSub">A sample creative placeholder</div></div>
 </div>
 <div class="feed-head">For You</div>
-<div class="overlay-note">This is a placeholder creative. Replace it with the approved experimental video.</div>
+<div class="overlay-note">Placeholder creative only. Replace with the approved experimental video before data collection.</div>
 <div class="feed-bottom"><strong>@brand_demo</strong><span id="caption">Something unexpected is about to happen…</span></div>
 <div class="actions"><div class="action">♡<small>Like</small></div><div class="action">◯<small>Comment</small></div><div class="action">↗<small>Share</small></div></div>
 </section>
@@ -75,7 +75,7 @@ input[type=text]{width:100%;padding:14px;border-radius:10px;border:1px solid #41
 <p class="small">PART 4 · VOLUNTARY VIEWING</p><h2>Now playing</h2>
 <div class="watch-card"><div><div style="font-size:42px">▶</div><strong>Full video placeholder</strong><p class="small">Replace with the complete ad video.</p></div></div>
 <div class="timer" id="timer">00:00</div>
-<p class="small" style="text-align:center">Viewing time is being measured while this page is visible.</p>
+<p class="small" style="text-align:center">Prototype viewing time: elapsed time while this page is visible.</p>
 <button class="primary" id="endWatch">Finish viewing</button>
 </section>
 
@@ -88,10 +88,21 @@ input[type=text]{width:100%;padding:14px;border-radius:10px;border:1px solid #41
 <div class="footer">BRM - GR 7 · Research prototype</div>
 </main></div>
 <script>
-const state={participantId:"",condition:"",hookStart:null,hookDurationMs:null,answers:[],voluntaryChoice:"",voluntaryStart:null,voluntaryDurationMs:0,finishedAt:null};
+const state={
+ participantId:"",groupId:"",condition:"",hookVersion:"",
+ hookStart:null,hookDurationMs:null,answers:[],
+ voluntaryChoice:"",voluntaryStart:null,voluntaryDurationMs:0,finishedAt:null
+};
 const $=id=>document.getElementById(id);
-function show(id,label){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");$("step").textContent=label;}
-function fmt(ms){const s=Math.max(0,Math.floor(ms/1000));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");}
+let hookTimeout=null,watchFrame=null,watchStartWall=null;
+function show(id,label){
+ document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+ $(id).classList.add("active");$("step").textContent=label;
+}
+function fmt(ms){
+ const s=Math.max(0,Math.floor(ms/1000));
+ return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+}
 const draftItems=[
  "I feel curious about what happens next.",
  "I want to find out more about what I have just seen.",
@@ -103,36 +114,116 @@ function renderItems(){
   const wrap=document.createElement("div");wrap.className="question";
   const label=document.createElement("label");label.textContent=(i+1)+". "+q;wrap.appendChild(label);
   const scale=document.createElement("div");scale.className="scale";
-  for(let n=1;n<=7;n++){const l=document.createElement("label");l.innerHTML=`<input type="radio" name="q${i}" value="${n}"><span>${n}</span>`;scale.appendChild(l);}
+  for(let n=1;n<=7;n++){
+   const l=document.createElement("label");
+   l.innerHTML=`<input type="radio" name="q${i}" value="${n}"><span>${n}</span>`;
+   scale.appendChild(l);
+  }
   wrap.appendChild(scale);$("items").appendChild(wrap);
  });
 }
+// Four equally likely conditions. This is client-side prototype randomization,
+// not concealed/server-side allocation for formal data collection.
+const GROUPS=[
+ {groupId:"G1",condition:"Hedonic",hookVersion:"A",title:"FEEL THE MOMENT",sub:"A hedonic-style Hook A placeholder",caption:"An experience worth discovering…"},
+ {groupId:"G2",condition:"Hedonic",hookVersion:"B",title:"WAIT… THERE'S MORE",sub:"A hedonic-style Hook B placeholder",caption:"A moment you won't want to miss…"},
+ {groupId:"G3",condition:"Utilitarian",hookVersion:"A",title:"A SMARTER WAY TO SOLVE IT",sub:"A utilitarian-style Hook A placeholder",caption:"A solution you may want to know about…"},
+ {groupId:"G4",condition:"Utilitarian",hookVersion:"B",title:"HERE'S HOW TO MAKE IT EASIER",sub:"A utilitarian-style Hook B placeholder",caption:"Discover a practical way to get it done…"}
+];
+function assignGroup(){
+ // Keep the same assignment for the same participant ID in this browser.
+ const key="brm_gr7_assignment_"+state.participantId;
+ let saved=null;
+ try{saved=JSON.parse(localStorage.getItem(key)||"null");}catch(e){}
+ let group=saved&&GROUPS.find(g=>g.groupId===saved.groupId);
+ if(!group){
+  group=GROUPS[Math.floor(Math.random()*GROUPS.length)];
+  try{localStorage.setItem(key,JSON.stringify({groupId:group.groupId,assignedAt:new Date().toISOString()}));}catch(e){}
+ }
+ Object.assign(state,{groupId:group.groupId,condition:group.condition,hookVersion:group.hookVersion});
+ return group;
+}
 $("start").onclick=()=>{
- const id=$("pid").value.trim();if(!id){alert("Please enter your participant ID.");return;}
+ const id=$("pid").value.trim();
+ if(!id){alert("Please enter your participant ID.");return;}
  state.participantId=id;
- state.condition=Math.random()<.5?"Hedonic":"Utilitarian";
- $("hookTitle").textContent=state.condition==="Hedonic"?"FEEL THE MOMENT":"A SMARTER WAY TO SOLVE IT";
- $("hookSub").textContent=state.condition==="Hedonic"?"A hedonic-style creative placeholder":"A utilitarian-style creative placeholder";
+ const group=assignGroup();
+ $("hookTitle").textContent=group.title;
+ $("hookSub").textContent=group.sub;
  $("video").classList.toggle("util",state.condition==="Utilitarian");
- $("caption").textContent=state.condition==="Hedonic"?"An experience worth discovering…":"A solution you may want to know about…";
- state.hookStart=performance.now();show("hook","VIDEO FEED");
- // Prototype timing: hook ends after a fixed 8 seconds; configure to match approved protocol.
- setTimeout(()=>{state.hookDurationMs=performance.now()-state.hookStart;renderItems();show("survey","QUESTIONNAIRE");},8000);
+ $("caption").textContent=group.caption;
+ state.hookStart=performance.now();
+ show("hook","VIDEO FEED");
+ if(hookTimeout)clearTimeout(hookTimeout);
+ // Prototype hook exposure duration; set to the approved protocol duration.
+ hookTimeout=setTimeout(()=>{
+  state.hookDurationMs=performance.now()-state.hookStart;
+  renderItems();show("survey","QUESTIONNAIRE");
+ },8000);
 };
 $("submitSurvey").onclick=()=>{
- const values=draftItems.map((_,i)=>{const el=document.querySelector(`input[name="q${i}"]:checked`);return el?Number(el.value):null;});
+ const values=draftItems.map((_,i)=>{
+  const el=document.querySelector(`input[name="q${i}"]:checked`);
+  return el?Number(el.value):null;
+ });
  if(values.some(v=>v===null)){alert("Please answer all questions.");return;}
  state.answers=values;show("voluntary","YOUR CHOICE");
 };
-function finish(){state.finishedAt=new Date().toISOString();if(state.voluntaryStart!==null&&state.voluntaryDurationMs===0)state.voluntaryDurationMs=performance.now()-state.voluntaryStart;show("done","COMPLETE");$("summary").innerHTML=`<b>Participant:</b> ${state.participantId}<br><b>Assigned condition:</b> ${state.condition}<br><b>Voluntary viewing:</b> ${state.voluntaryChoice}<br><b>Viewing duration:</b> ${fmt(state.voluntaryDurationMs)}`;}
-$("watch").onclick=()=>{state.voluntaryChoice="Continued";state.voluntaryStart=performance.now();show("watching","VOLUNTARY VIEWING");const start=performance.now();const tick=()=>{if($("watching").classList.contains("active")){$("timer").textContent=fmt(performance.now()-start);requestAnimationFrame(tick);}};tick();};
-$("finishNow").onclick=()=>{state.voluntaryChoice="Did not continue";state.voluntaryDurationMs=0;finish();};
-$("endWatch").onclick=()=>{state.voluntaryDurationMs=performance.now()-state.voluntaryStart;state.voluntaryStart=null;finish();};
+function finish(){
+ state.finishedAt=new Date().toISOString();
+ if(state.voluntaryStart!==null){
+  state.voluntaryDurationMs=performance.now()-state.voluntaryStart;
+  state.voluntaryStart=null;
+ }
+ if(watchFrame)cancelAnimationFrame(watchFrame);
+ show("done","COMPLETE");
+ $("summary").innerHTML=
+  `<b>Participant:</b> ${escapeHtml(state.participantId)}<br>`+
+  `<b>Assigned group:</b> ${state.groupId}<br>`+
+  `<b>Condition:</b> ${state.condition}<br>`+
+  `<b>Hook version:</b> ${state.hookVersion}<br>`+
+  `<b>Voluntary viewing:</b> ${state.voluntaryChoice}<br>`+
+  `<b>Viewing duration:</b> ${fmt(state.voluntaryDurationMs)}`;
+}
+function escapeHtml(s){
+ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+$("watch").onclick=()=>{
+ state.voluntaryChoice="Continued";
+ state.voluntaryStart=performance.now();
+ watchStartWall=performance.now();
+ show("watching","VOLUNTARY VIEWING");
+ const tick=()=>{
+  if($("watching").classList.contains("active")){
+   $("timer").textContent=fmt(performance.now()-watchStartWall);
+   watchFrame=requestAnimationFrame(tick);
+  }
+ };
+ tick();
+};
+$("finishNow").onclick=()=>{
+ state.voluntaryChoice="Did not continue";
+ state.voluntaryDurationMs=0;finish();
+};
+$("endWatch").onclick=()=>{
+ if(state.voluntaryStart!==null){
+  state.voluntaryDurationMs=performance.now()-state.voluntaryStart;
+  state.voluntaryStart=null;
+ }
+ finish();
+};
 $("export").onclick=()=>{
- const row=[state.participantId,state.condition,state.hookDurationMs,state.answers.join("|"),state.voluntaryChoice,state.voluntaryDurationMs,state.finishedAt];
- const csv=["participant_id,condition,hook_duration_ms,curiosity_item_scores,voluntary_choice,voluntary_viewing_ms,finished_at",row.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")].join("\n");
- const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`BRM-GR7-${state.participantId}.csv`;a.click();URL.revokeObjectURL(a.href);
+ const headers=["participant_id","group_id","condition","hook_version","hook_duration_ms",
+  "curiosity_item_scores","voluntary_choice","voluntary_viewing_ms","finished_at"];
+ const values=[state.participantId,state.groupId,state.condition,state.hookVersion,state.hookDurationMs,
+  state.answers.join("|"),state.voluntaryChoice,state.voluntaryDurationMs,state.finishedAt];
+ const csv=[headers.join(","),values.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")].join("\n");
+ const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+ a.download=`BRM-GR7-${state.participantId}.csv`;a.click();URL.revokeObjectURL(a.href);
 };
 $("restart").onclick=()=>location.reload();
+renderItems();
 </script>
-</body></html>
+</body>
+</html>
